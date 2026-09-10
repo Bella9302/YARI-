@@ -1,0 +1,71 @@
+{% extends "portal_base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head">
+  <div><a class="muted small" href="{{ url_for('admin.orders') }}">← Orders</a><h1>Order {{ order.order_number }}</h1></div>
+  <span class="pill pill-{{ order.status }}" style="font-size:.85rem">{{ order.status|status_label }}</span>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card">
+      <h3>Items</h3>
+      {% set show_seller = True %}{% include "_order_items.html" %}
+    </div>
+    <div class="card">
+      <h3>Customer & delivery</h3>
+      {% include "_order_customer.html" %}
+    </div>
+    <div class="card">
+      <h3>History</h3>
+      {% include "_order_timeline.html" %}
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h3>Placed by representative</h3>
+      <dl class="kv">
+        <dt>Name</dt><dd>{{ order.rep_name }}</dd>
+        <dt>Code</dt><dd><code>{{ order.rep_code }}</code></dd>
+        {% if order.rep_phone %}<dt>Phone</dt><dd>{{ order.rep_phone }}</dd>{% endif %}
+        <dt>Email</dt><dd>{{ order.rep_email }}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h3>{% if order.seller_id %}Seller{% else %}Send to a seller{% endif %}</h3>
+      {% if order.seller_id %}<p>Currently with <strong>{{ order.seller_name }}</strong>{% if order.seller_business %} ({{ order.seller_business }}){% endif %}.</p>{% endif %}
+      {% if order.status != 'cancelled' and order.status != 'delivered' %}
+      <form method="post" action="{{ url_for('admin.order_send', order_id=order.id) }}">{{ csrf_field() }}
+        <div class="field">
+          <label for="seller_id">{% if order.seller_id %}Reassign to{% else %}Seller{% endif %}</label>
+          <select id="seller_id" name="seller_id" required>
+            <option value="">— Choose a seller —</option>
+            {% for s in sellers %}<option value="{{ s.id }}" {% if (order.seller_id or suggested_seller_id) == s.id %}selected{% endif %}>{{ s.name }}{% if s.business_name %} · {{ s.business_name }}{% endif %}</option>{% endfor %}
+          </select>
+          {% if suggested_seller_id and not order.seller_id %}<div class="hint">Suggested based on who supplies these products.</div>{% endif %}
+        </div>
+        <div class="field"><label for="send_note">Note to seller <span class="muted">(optional)</span></label><input id="send_note" type="text" name="note" placeholder="e.g. Customer needs it before Friday"></div>
+        <button class="btn btn-accent btn-block" type="submit">{% if order.seller_id %}Resend to seller{% else %}Send order to seller{% endif %}</button>
+      </form>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h3>Payment</h3>
+      <form method="post" action="{{ url_for('admin.order_payment', order_id=order.id) }}">{{ csrf_field() }}
+        <div class="field"><label for="payment_status">Status</label>
+          <select id="payment_status" name="payment_status"><option value="unpaid" {% if order.payment_status == 'unpaid' %}selected{% endif %}>Unpaid</option><option value="paid" {% if order.payment_status == 'paid' %}selected{% endif %}>Paid</option></select></div>
+        <div class="field"><label for="payment_reference">EFT / payment reference</label><input id="payment_reference" type="text" name="payment_reference" value="{{ order.payment_reference or '' }}" placeholder="{{ order.rep_code }}"></div>
+        <button class="btn btn-outline btn-block" type="submit">Save payment</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Change status</h3>
+      <form method="post" action="{{ url_for('admin.order_status', order_id=order.id) }}">{{ csrf_field() }}
+        <div class="field"><select name="status">{% for s in statuses %}<option value="{{ s }}" {% if s == order.status %}selected{% endif %}>{{ s|status_label }}</option>{% endfor %}</select></div>
+        <div class="field"><input type="text" name="note" placeholder="Note (optional)"></div>
+        <button class="btn btn-outline btn-block" type="submit">Update status</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

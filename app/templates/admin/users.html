@@ -1,0 +1,21 @@
+{% extends "portal_base.html" %}
+{% block title %}Sellers & representatives{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head"><h1>Sellers & representatives</h1><a class="btn btn-sm" href="{{ url_for('admin.user_new') }}">+ Add account</a></div>
+<div class="card">
+<div class="table-wrap"><table>
+  <thead><tr><th>Name</th><th>Role</th><th>Rep code</th><th>Contact</th><th>Orders</th><th>Status</th><th></th></tr></thead>
+  <tbody>{% for u in users %}
+    <tr {% if not u.active %}style="opacity:.55"{% endif %}>
+      <td><strong>{{ u.name }}</strong>{% if u.business_name %}<div class="muted small">{{ u.business_name }}</div>{% endif %}</td>
+      <td>{{ {'owner': 'Owner', 'seller': 'Seller', 'rep': 'Sales rep'}[u.role] }}</td>
+      <td>{% if u.rep_code %}<code>{{ u.rep_code }}</code>{% else %}—{% endif %}</td>
+      <td class="small">{{ u.email }}<div class="muted">{{ u.phone or '' }}</div></td>
+      <td>{{ u.order_count }}</td>
+      <td><span class="pill {{ 'pill-paid' if u.active else 'pill-unpaid' }}">{{ 'Active' if u.active else 'Deactivated' }}</span></td>
+      <td><a class="btn btn-outline btn-sm" href="{{ url_for('admin.user_edit', user_id=u.id) }}">Edit</a></td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+</div>
+{% endblock %}

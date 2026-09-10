@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}How it works{% endblock %}
+{% block content %}
+<div class="page prose">
+  <span class="eyebrow">About {{ cfg.BUSINESS_NAME }}</span>
+  <h1>Shopping that feels personal</h1>
+  <p>{{ cfg.BUSINESS_NAME }} brings together lifestyle, household and personal care products from trusted sellers, and delivers them through a network of sales representatives — people in your community who know you and can help you choose.</p>
+  <h2>For customers</h2>
+  <p>Browse online, add products to your cart and choose your representative at checkout. They confirm your order, collect payment and deliver to your door. No card details are needed on the website.</p>
+  <h2>For representatives</h2>
+  <p>Each representative has a unique code. Customers use it at checkout, and representatives use it as the payment reference when they pay YARI by EFT. Log in to see every order placed through you and to record payments.</p>
+  <h2>For sellers</h2>
+  <p>Sellers log in to see the orders the store owner has sent to them, prepare the products, and update the status as the order is packed, shipped and delivered.</p>
+  <h2>Want to become a representative?</h2>
+  <p><a href="{{ url_for('shop.contact') }}" style="text-decoration:underline">Get in touch</a> and tell us a little about yourself — we'd love to hear from you.</p>
+</div>
+{% endblock %}

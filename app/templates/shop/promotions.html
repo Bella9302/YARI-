@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Promotions & offers{% endblock %}
+{% block content %}
+<div class="page">
+  <span class="eyebrow">Special offers</span>
+  <h1>Promotions</h1>
+  {% if promotions %}
+  <div class="promo-strip" style="margin-bottom:40px">
+    {% for promo in promotions %}
+      <div class="promo-card {% if loop.index is even %}light{% endif %}">
+        <span class="eyebrow" style="color:inherit;opacity:.7">{{ promo.discount_percent|round|int }}% off</span>
+        <h3>{{ promo.title }}</h3>
+        <p class="small" style="margin:0;opacity:.85">{{ promo.description }}</p>
+        {% if promo.code %}<span class="code">{{ promo.code }}</span><span class="small" style="opacity:.7">Enter this code at checkout{% if promo.ends_at %} · ends {{ promo.ends_at }}{% endif %}</span>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}<p class="muted">There are no promo codes running right now — check back soon.</p>{% endif %}
+  <div class="section-head"><h2>Products on sale</h2></div>
+  {% if on_sale %}<div class="product-grid">{% for p in on_sale %}{% include "_product_card.html" %}{% endfor %}</div>
+  {% else %}<p class="muted">No products are marked down at the moment.</p>{% endif %}
+</div>
+{% endblock %}

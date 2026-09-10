@@ -1,0 +1,36 @@
+{% extends "portal_base.html" %}
+{% block title %}Representative dashboard{% endblock %}
+{% block portal_links %}{% include "rep/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head"><h1>Welcome, {{ g.user.name.split()[0] }}</h1><a class="btn btn-sm" href="{{ url_for('shop.products') }}">+ Place an order</a></div>
+<div class="card" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+  <div><div class="eyebrow">Your unique code</div><span class="code-chip">{{ g.user.rep_code }}</span></div>
+  <p class="muted small" style="margin:0;max-width:52ch">Customers enter this code at checkout so their order is linked to you. Use it as the reference when you EFT customer payments to YARI.</p>
+</div>
+<div class="stat-grid" style="margin-top:18px">
+  <div class="stat"><div class="label">Orders placed</div><div class="value">{{ totals.orders }}</div></div>
+  <div class="stat"><div class="label">Total sales</div><div class="value">{{ totals.sales|money }}</div></div>
+  <div class="stat accent"><div class="label">Payments to collect</div><div class="value">{{ totals.outstanding|money }}</div></div>
+</div>
+<div class="tabs">
+  <a href="{{ url_for('rep.dashboard') }}" class="{% if not status %}active{% endif %}">All</a>
+  {% for s in ['placed', 'sent_to_seller', 'processing', 'shipped', 'delivered'] %}<a href="{{ url_for('rep.dashboard', status=s) }}" class="{% if status == s %}active{% endif %}">{{ s|status_label }}</a>{% endfor %}
+</div>
+<div class="card">
+{% if orders %}
+<div class="table-wrap"><table>
+  <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Paid</th><th>Seller</th><th class="text-right">Total</th><th>Placed</th></tr></thead>
+  <tbody>{% for o in orders %}
+    <tr>
+      <td><a href="{{ url_for('rep.order_detail', order_id=o.id) }}" style="font-weight:600">{{ o.order_number }}</a></td>
+      <td>{{ o.customer_name }}<div class="muted small">{{ o.customer_phone }}</div></td>
+      <td><span class="pill pill-{{ o.status }}">{{ o.status|status_label }}</span></td>
+      <td><span class="pill pill-{{ o.payment_status }}">{{ o.payment_status }}</span></td>
+      <td>{{ o.seller_name or '—' }}</td>
+      <td class="text-right">{{ o.total|money }}</td>
+      <td class="muted small">{{ o.created_at|nice_date }}</td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+{% else %}<p class="muted" style="margin:0">No orders yet. Share your code with customers, or <a href="{{ url_for('shop.products') }}" style="text-decoration:underline">place an order</a> for them.</p>{% endif %}
+</div>
+{% endblock %}

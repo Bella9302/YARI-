@@ -1,0 +1,6 @@
+<ul class="timeline">
+  {% for e in events %}
+    <li><strong>{{ 'Payment' if e.status == 'payment' else e.status|status_label }}</strong>{% if e.note %} — {{ e.note }}{% endif %}
+      <div class="when">{{ e.created_at|nice_date }}{% if e.user_name %} · {{ e.user_name }}{% endif %}</div></li>
+  {% endfor %}
+</ul>

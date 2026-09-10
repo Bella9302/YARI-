@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="eyebrow">Lifestyle · Household · Personal care</span>
+    <h1>Beautiful everyday essentials, delivered by someone you know.</h1>
+    <p>Browse the collection, fill your cart and check out with your YARI representative. They handle payment and delivery so shopping stays simple and personal.</p>
+    <div class="hero-actions">
+      <a class="btn" href="{{ url_for('shop.products') }}">Shop the collection</a>
+      <a class="btn btn-outline" href="{{ url_for('shop.about') }}">How it works</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="{{ url_for('static', filename='img/hero.svg') }}" alt="A curated selection of YARI Lifestyle products">
+    <span class="hero-tag">New season collection now in</span>
+  </div>
+</section>
+
+<div class="trust-row">
+  <div><strong>Personal service</strong><span class="muted">Order through a representative you trust.</span></div>
+  <div><strong>Flexible payment</strong><span class="muted">Pay your rep directly or online when available.</span></div>
+  <div><strong>Trusted quality</strong><span class="muted">Every product is checked before it ships.</span></div>
+  <div><strong>Easy returns</strong><span class="muted">7-day returns on unopened items.</span></div>
+</div>
+
+<section class="section">
+  <div class="section-head"><h2>Shop by category</h2><a href="{{ url_for('shop.products') }}">View all</a></div>
+  <div class="category-grid">
+    {% for c in nav_categories %}
+      <a class="category-card" href="{{ url_for('shop.products', category=c.slug) }}">
+        <img src="{{ c.image or url_for('static', filename='img/placeholder.svg') }}" alt="">
+        <span>{{ c.name }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if featured %}
+<section class="section">
+  <div class="section-head"><h2>Customer favourites</h2><a href="{{ url_for('shop.products') }}">Shop all</a></div>
+  <div class="product-grid">{% for p in featured %}{% include "_product_card.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if promotions %}
+<section class="section">
+  <div class="section-head"><h2>Promotions & special offers</h2><a href="{{ url_for('shop.promotions') }}">All offers</a></div>
+  <div class="promo-strip">
+    {% for promo in promotions %}
+      <div class="promo-card {% if loop.index is even %}light{% endif %}">
+        <span class="eyebrow" style="color:inherit;opacity:.7">{{ promo.discount_percent|round|int }}% off</span>
+        <h3>{{ promo.title }}</h3>
+        <p class="small" style="margin:0;opacity:.85">{{ promo.description }}</p>
+        {% if promo.code %}<span class="code">{{ promo.code }}</span>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if new_arrivals %}
+<section class="section">
+  <div class="section-head"><h2>Discover what's new</h2><a href="{{ url_for('shop.products', new=1) }}">All new arrivals</a></div>
+  <div class="product-grid">{% for p in new_arrivals %}{% include "_product_card.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="section-head"><h2>How ordering works</h2></div>
+  <div class="how-it-works">
+    <div class="step"><div class="num">1</div><h3>Browse & add to cart</h3><p class="muted">Explore products by category, search, or discover what's new this season.</p></div>
+    <div class="step"><div class="num">2</div><h3>Check out with your rep</h3><p class="muted">Choose your YARI representative at checkout, or enter the code they gave you.</p></div>
+    <div class="step"><div class="num">3</div><h3>Pay & receive</h3><p class="muted">Pay your representative (or online when available). They confirm payment and arrange delivery.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="cta-band">
+    <div>
+      <h2>Don't have a representative yet?</h2>
+      <p class="muted" style="margin:0">Get in touch and we'll connect you with a YARI representative in your area.</p>
+    </div>
+    <a class="btn btn-accent" href="{{ url_for('shop.contact') }}">Contact us</a>
+  </div>
+</section>
+{% endblock %}

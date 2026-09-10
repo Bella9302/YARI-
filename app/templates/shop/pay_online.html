@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Pay online{% endblock %}
+{% block content %}
+<div class="page page-narrow">
+  <div class="card confirmation">
+    <h1>Complete your payment</h1>
+    <p class="muted">Order <strong>{{ order.order_number }}</strong> · Total {{ order.total|money }}</p>
+    <div class="notice" style="text-align:left">
+      The online payment gateway is not connected yet. Your order has been saved and your representative has been notified — you can pay them directly, and they will confirm the payment for you.
+    </div>
+    <a class="btn" style="margin-top:20px" href="{{ url_for('shop.order_confirmation', order_number=order.order_number) }}">View order confirmation</a>
+  </div>
+</div>
+{% endblock %}

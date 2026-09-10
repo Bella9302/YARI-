@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block meta_description %}{{ (product.description or '')[:150] }}{% endblock %}
+{% block content %}
+<nav class="breadcrumb"><a href="{{ url_for('shop.home') }}">Home</a> / <a href="{{ url_for('shop.products') }}">Shop</a>{% if product.category_name %} / <a href="{{ url_for('shop.products', category=product.category_slug) }}">{{ product.category_name }}</a>{% endif %} / {{ product.name }}</nav>
+<div class="product-page">
+  <div class="gallery"><img src="{{ product.image or url_for('static', filename='img/placeholder.svg') }}" alt="{{ product.name }}"></div>
+  <div>
+    {% if product.category_name %}<span class="eyebrow">{{ product.category_name }}</span>{% endif %}
+    <h1>{{ product.name }}</h1>
+    <div class="price-row">
+      <span class="price">{{ product.price|money }}</span>
+      {% if product.compare_at_price and product.compare_at_price > product.price %}
+        <s class="was">{{ product.compare_at_price|money }}</s>
+        <span class="badge badge-sale">Save {{ ((1 - product.price / product.compare_at_price) * 100)|round|int }}%</span>
+      {% elif product.is_new %}<span class="badge badge-new">New</span>{% endif %}
+    </div>
+    <p class="description">{{ product.description }}</p>
+    <form method="post" action="{{ url_for('shop.cart_add') }}" class="buy-box">{{ csrf_field() }}
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <div class="qty" data-qty>
+        <button type="button" data-minus aria-label="Decrease">−</button>
+        <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+        <button type="button" data-plus aria-label="Increase">+</button>
+      </div>
+      <button class="btn" type="submit" {% if product.stock <= 0 %}disabled{% endif %}>{% if product.stock <= 0 %}Sold out{% else %}Add to cart{% endif %}</button>
+    </form>
+    <ul class="meta-list">
+      <li><span class="muted">Availability</span><span>{% if product.stock > 5 %}In stock{% elif product.stock > 0 %}Only {{ product.stock }} left{% else %}Sold out{% endif %}</span></li>
+      <li><span class="muted">Ordering</span><span>Through your YARI representative</span></li>
+      <li><span class="muted">Returns</span><span><a href="{{ url_for('shop.delivery') }}" style="text-decoration:underline">7-day returns on unopened items</a></span></li>
+    </ul>
+  </div>
+</div>
+{% if related %}
+<section class="section">
+  <div class="section-head"><h2>You may also like</h2></div>
+  <div class="product-grid">{% for p in related %}{% include "_product_card.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

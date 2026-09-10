@@ -1,0 +1,19 @@
+{% extends "portal_base.html" %}
+{% block title %}Messages{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<h1>Contact messages</h1>
+{% for m in messages %}
+  <div class="card" {% if m.is_read %}style="opacity:.7"{% endif %}>
+    <div class="page-head" style="margin-bottom:8px">
+      <div><strong>{{ m.subject or 'Message' }}</strong> <span class="muted small">from {{ m.name }} · <a href="mailto:{{ m.email }}">{{ m.email }}</a>{% if m.phone %} · {{ m.phone }}{% endif %}</span></div>
+      <span class="muted small">{{ m.created_at|nice_date }}</span>
+    </div>
+    <p style="white-space:pre-line;margin:0 0 12px">{{ m.body }}</p>
+    <div class="actions">
+      <form method="post" action="{{ url_for('admin.message_read', message_id=m.id) }}">{{ csrf_field() }}<button class="btn btn-outline btn-sm" type="submit">{{ 'Mark unread' if m.is_read else 'Mark as read' }}</button></form>
+      <form method="post" action="{{ url_for('admin.message_delete', message_id=m.id) }}" data-confirm="Delete this message?">{{ csrf_field() }}<button class="btn btn-danger btn-sm" type="submit">Delete</button></form>
+    </div>
+  </div>
+{% else %}<div class="card"><p class="muted" style="margin:0">No messages yet.</p></div>{% endfor %}
+{% endblock %}

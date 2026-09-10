@@ -1,0 +1,37 @@
+{% extends "portal_base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block portal_links %}{% include "seller/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head">
+  <div><a class="muted small" href="{{ url_for('seller.dashboard') }}">← My orders</a><h1>Order {{ order.order_number }}</h1></div>
+  <span class="pill pill-{{ order.status }}" style="font-size:.85rem">{{ order.status|status_label }}</span>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card"><h3>Items to prepare</h3>{% set show_seller = False %}{% include "_order_items.html" %}</div>
+    <div class="card"><h3>Deliver to</h3>{% include "_order_customer.html" %}</div>
+    <div class="card"><h3>History</h3>{% include "_order_timeline.html" %}</div>
+  </div>
+  <div>
+    <div class="card">
+      <h3>Update progress</h3>
+      {% if order.status == 'cancelled' %}<p class="muted">This order was cancelled.</p>
+      {% else %}
+      <form method="post" action="{{ url_for('seller.order_status', order_id=order.id) }}">{{ csrf_field() }}
+        <div class="choice-list">
+          <label class="choice"><input type="radio" name="status" value="processing" {% if order.status in ['sent_to_seller', 'processing'] %}checked{% endif %}><div><strong>Being prepared</strong><span>You've received the order and are packing it.</span></div></label>
+          <label class="choice"><input type="radio" name="status" value="shipped" {% if order.status == 'shipped' %}checked{% endif %}><div><strong>On its way</strong><span>Handed over for delivery.</span></div></label>
+          <label class="choice"><input type="radio" name="status" value="delivered" {% if order.status == 'delivered' %}checked{% endif %}><div><strong>Delivered</strong><span>The customer has received it.</span></div></label>
+        </div>
+        <div class="field" style="margin-top:14px"><input type="text" name="note" placeholder="Note for the owner / rep (optional)"></div>
+        <button class="btn btn-accent btn-block" type="submit">Save update</button>
+      </form>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h3>Representative</h3>
+      <dl class="kv"><dt>Name</dt><dd>{{ order.rep_name }}</dd>{% if order.rep_phone %}<dt>Phone</dt><dd><a href="tel:{{ order.rep_phone|replace(' ', '') }}">{{ order.rep_phone }}</a></dd>{% endif %}<dt>Code</dt><dd><code>{{ order.rep_code }}</code></dd></dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

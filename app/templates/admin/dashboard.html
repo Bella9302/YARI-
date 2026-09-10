@@ -1,0 +1,20 @@
+{% extends "portal_base.html" %}
+{% block title %}Owner dashboard{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head"><h1>Dashboard</h1><a class="btn btn-sm" href="{{ url_for('admin.product_new') }}">+ Add product</a></div>
+<div class="stat-grid">
+  <a class="stat accent" href="{{ url_for('admin.orders', status='placed') }}"><div class="label">New orders to send</div><div class="value">{{ stats.new_orders }}</div></a>
+  <a class="stat" href="{{ url_for('admin.orders') }}"><div class="label">In progress</div><div class="value">{{ stats.in_progress }}</div></a>
+  <div class="stat"><div class="label">Delivered</div><div class="value">{{ stats.delivered }}</div></div>
+  <div class="stat"><div class="label">Total sales</div><div class="value">{{ stats.revenue|money }}</div></div>
+  <a class="stat" href="{{ url_for('admin.products') }}"><div class="label">Active products</div><div class="value">{{ stats.products }}</div></a>
+  <div class="stat"><div class="label">Low stock (≤5)</div><div class="value">{{ stats.low_stock }}</div></div>
+  <a class="stat" href="{{ url_for('admin.users') }}"><div class="label">Reps / sellers</div><div class="value">{{ stats.reps }} / {{ stats.sellers }}</div></a>
+  <a class="stat" href="{{ url_for('admin.messages') }}"><div class="label">Unread messages</div><div class="value">{{ stats.unread_messages }}</div></a>
+</div>
+<div class="card">
+  <div class="page-head" style="margin-bottom:12px"><h3 style="margin:0">Recent orders</h3><a class="small" href="{{ url_for('admin.orders') }}" style="text-decoration:underline">All orders</a></div>
+  {% include "admin/_orders_table.html" with context %}
+</div>
+{% endblock %}

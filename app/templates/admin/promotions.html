@@ -1,0 +1,41 @@
+{% extends "portal_base.html" %}
+{% block title %}Promotions{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<h1>Promotions</h1>
+<div class="two-col">
+  <div class="card">
+    {% if promotions %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Promotion</th><th>Code</th><th>Discount</th><th>Runs</th><th>Status</th><th></th></tr></thead>
+      <tbody>{% for p in promotions %}
+        <tr>
+          <td><strong>{{ p.title }}</strong><div class="muted small">{{ p.description }}</div></td>
+          <td>{% if p.code %}<code>{{ p.code }}</code>{% else %}—{% endif %}</td>
+          <td>{{ p.discount_percent|round|int }}%</td>
+          <td class="muted small">{{ p.starts_at or 'now' }} → {{ p.ends_at or 'no end' }}</td>
+          <td><span class="pill {{ 'pill-paid' if p.active else '' }}">{{ 'Active' if p.active else 'Paused' }}</span></td>
+          <td class="actions">
+            <form method="post" action="{{ url_for('admin.promotion_toggle', promo_id=p.id) }}">{{ csrf_field() }}<button class="btn btn-outline btn-sm" type="submit">{{ 'Pause' if p.active else 'Activate' }}</button></form>
+            <form method="post" action="{{ url_for('admin.promotion_delete', promo_id=p.id) }}" data-confirm="Delete this promotion?">{{ csrf_field() }}<button class="btn btn-danger btn-sm" type="submit">Delete</button></form>
+          </td>
+        </tr>{% endfor %}
+      </tbody></table></div>
+    {% else %}<p class="muted">No promotions yet.</p>{% endif %}
+  </div>
+  <form method="post" class="card">{{ csrf_field() }}
+    <h3>Create a promotion</h3>
+    <div class="field"><label for="title">Title</label><input id="title" type="text" name="title" required placeholder="e.g. Spring sale"></div>
+    <div class="field"><label for="description">Description</label><input id="description" type="text" name="description"></div>
+    <div class="field-row">
+      <div class="field"><label for="code">Promo code</label><input id="code" type="text" name="code" placeholder="SPRING10" style="text-transform:uppercase"><div class="hint">Leave blank for an announcement-only offer.</div></div>
+      <div class="field"><label for="discount_percent">Discount %</label><input id="discount_percent" type="number" name="discount_percent" min="0" max="100" step="0.5" value="10"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label for="starts_at">Starts</label><input id="starts_at" type="date" name="starts_at"></div>
+      <div class="field"><label for="ends_at">Ends</label><input id="ends_at" type="date" name="ends_at"></div>
+    </div>
+    <button class="btn btn-block" type="submit">Create promotion</button>
+  </form>
+</div>
+{% endblock %}

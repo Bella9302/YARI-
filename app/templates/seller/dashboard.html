@@ -1,0 +1,42 @@
+{% extends "portal_base.html" %}
+{% block title %}Seller dashboard{% endblock %}
+{% block portal_links %}{% include "seller/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<h1>Orders sent to {{ g.user.business_name or 'you' }}</h1>
+<div class="stat-grid">
+  <a class="stat accent" href="{{ url_for('seller.dashboard', status='sent_to_seller') }}"><div class="label">New to prepare</div><div class="value">{{ counts.sent_to_seller }}</div></a>
+  <a class="stat" href="{{ url_for('seller.dashboard', status='processing') }}"><div class="label">Being prepared</div><div class="value">{{ counts.processing }}</div></a>
+  <a class="stat" href="{{ url_for('seller.dashboard', status='shipped') }}"><div class="label">On the way</div><div class="value">{{ counts.shipped }}</div></a>
+  <a class="stat" href="{{ url_for('seller.dashboard', status='delivered') }}"><div class="label">Delivered</div><div class="value">{{ counts.delivered }}</div></a>
+</div>
+<div class="tabs">
+  <a href="{{ url_for('seller.dashboard') }}" class="{% if not status %}active{% endif %}">All</a>
+  {% for s in ['sent_to_seller', 'processing', 'shipped', 'delivered'] %}<a href="{{ url_for('seller.dashboard', status=s) }}" class="{% if status == s %}active{% endif %}">{{ s|status_label }}</a>{% endfor %}
+</div>
+<div class="card">
+{% if orders %}
+<div class="table-wrap"><table>
+  <thead><tr><th>Order</th><th>Customer</th><th>Representative</th><th>Status</th><th class="text-right">Total</th><th>Updated</th></tr></thead>
+  <tbody>{% for o in orders %}
+    <tr>
+      <td><a href="{{ url_for('seller.order_detail', order_id=o.id) }}" style="font-weight:600">{{ o.order_number }}</a></td>
+      <td>{{ o.customer_name }}</td>
+      <td>{{ o.rep_name }}</td>
+      <td><span class="pill pill-{{ o.status }}">{{ o.status|status_label }}</span></td>
+      <td class="text-right">{{ o.total|money }}</td>
+      <td class="muted small">{{ o.updated_at|nice_date }}</td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+{% else %}<p class="muted" style="margin:0">No orders here yet. The store owner will send orders to you as they come in.</p>{% endif %}
+</div>
+{% if products %}
+<div class="card">
+  <h3>Your products in the shop</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Product</th><th class="text-right">Price</th><th>Stock</th><th>Status</th></tr></thead>
+    <tbody>{% for p in products %}<tr><td>{{ p.name }}</td><td class="text-right">{{ p.price|money }}</td><td>{{ p.stock }}</td><td><span class="pill {{ 'pill-paid' if p.active else '' }}">{{ 'Live' if p.active else 'Hidden' }}</span></td></tr>{% endfor %}</tbody>
+  </table></div>
+  <p class="muted small" style="margin:10px 0 0">To add or change products, contact the store owner.</p>
+</div>
+{% endif %}
+{% endblock %}

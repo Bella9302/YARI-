@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="page page-narrow">
+  <div class="confirmation">
+    <div class="tick">✓</div>
+    <h1>Thank you, {{ order.customer_name.split()[0] }}!</h1>
+    <p class="muted">Your order has been placed with your representative.</p>
+    <span class="order-number">{{ order.order_number }}</span>
+    <p class="muted small" style="margin-top:12px">Keep this number to track your order.</p>
+  </div>
+  <div class="card">
+    <h3>What happens next</h3>
+    <ol style="margin:0;padding-left:20px;font-size:.92rem;line-height:1.8">
+      <li><strong>{{ order.rep_name }}</strong> ({{ order.rep_code }}) will contact you on {{ order.customer_phone }} to confirm your order{% if order.payment_method == 'rep' %} and collect payment{% endif %}.</li>
+      <li>The store owner reviews the order and sends it to the seller for packing.</li>
+      <li>Your representative arranges delivery to: <em>{{ order.customer_address }}</em></li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>Order summary</h3>
+    {% for item in items %}<div class="summary-row"><span>{{ item.product_name }} <span class="muted">× {{ item.quantity }}</span></span><span>{{ (item.unit_price * item.quantity)|money }}</span></div>{% endfor %}
+    {% if order.discount %}<div class="summary-row" style="color:var(--success)"><span>Discount ({{ order.promo_code }})</span><span>−{{ order.discount|money }}</span></div>{% endif %}
+    <div class="summary-row total"><span>Total</span><span>{{ order.total|money }}</span></div>
+    <p class="muted small" style="margin:12px 0 0">Payment: {% if order.payment_method == 'rep' %}to your representative{% else %}online{% endif %} · Status: <span class="pill pill-{{ order.status }}">{{ order.status|status_label }}</span></p>
+  </div>
+  <div class="actions" style="justify-content:center;margin-top:20px">
+    <a class="btn btn-outline" href="{{ url_for('shop.track', order_number=order.order_number, phone=order.customer_phone) }}">Track this order</a>
+    <a class="btn" href="{{ url_for('shop.products') }}">Continue shopping</a>
+  </div>
+</div>
+{% endblock %}

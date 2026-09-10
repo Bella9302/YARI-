@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% elif q %}Search: {{ q }}{% else %}Shop{% endif %}{% endblock %}
+{% block content %}
+<div class="shop-layout">
+  <aside class="filters">
+    <div class="group">
+      <h4>Categories</h4>
+      <a href="{{ url_for('shop.products', q=q or None) }}" class="{% if not category and not only_new and not only_sale %}active{% endif %}">All products</a>
+      {% for c in nav_categories %}
+        <a href="{{ url_for('shop.products', category=c.slug, q=q or None) }}" class="{% if category and category.id == c.id %}active{% endif %}">{{ c.name }}</a>
+      {% endfor %}
+    </div>
+    <div class="group">
+      <h4>Discover</h4>
+      <a href="{{ url_for('shop.products', new=1) }}" class="{% if only_new %}active{% endif %}">New arrivals</a>
+      <a href="{{ url_for('shop.products', sale=1) }}" class="{% if only_sale %}active{% endif %}">On sale</a>
+    </div>
+  </aside>
+  <section>
+    <div class="toolbar">
+      <div>
+        <h1 style="font-size:1.7rem;margin:0">{% if category %}{{ category.name }}{% elif only_new %}New arrivals{% elif only_sale %}On sale{% elif q %}Results for “{{ q }}”{% else %}All products{% endif %}</h1>
+        <span class="muted small">{{ products|length }} product{{ '' if products|length == 1 else 's' }}{% if category and category.description %} · {{ category.description }}{% endif %}</span>
+      </div>
+      <form method="get" data-autosubmit>
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+        {% if category %}<input type="hidden" name="category" value="{{ category.slug }}">{% endif %}
+        {% if only_new %}<input type="hidden" name="new" value="1">{% endif %}
+        {% if only_sale %}<input type="hidden" name="sale" value="1">{% endif %}
+        <select name="sort" aria-label="Sort products">
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest first</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: low to high</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: high to low</option>
+          <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
+        </select>
+      </form>
+    </div>
+    {% if products %}
+      <div class="product-grid">{% for p in products %}{% include "_product_card.html" %}{% endfor %}</div>
+    {% else %}
+      <div class="empty">
+        <h3>No products found</h3>
+        <p>Try a different search, or <a href="{{ url_for('shop.products') }}" style="text-decoration:underline">browse everything</a>.</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

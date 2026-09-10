@@ -1,0 +1,25 @@
+{% extends "portal_base.html" %}
+{% block title %}Categories{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<h1>Categories</h1>
+<div class="two-col">
+  <div class="card">
+    {% for c in categories %}
+      <form method="post" action="{{ url_for('admin.category_edit', category_id=c.id) }}" class="inline-form" style="padding:10px 0;border-bottom:1px solid var(--border)">{{ csrf_field() }}
+        <input type="text" name="name" value="{{ c.name }}" required style="flex:1;min-width:140px">
+        <input type="text" name="description" value="{{ c.description or '' }}" placeholder="Short description" style="flex:2;min-width:160px">
+        <span class="pill">{{ c.product_count }} products</span>
+        <button class="btn btn-outline btn-sm" type="submit">Save</button>
+        <button class="btn btn-danger btn-sm" type="submit" formaction="{{ url_for('admin.category_delete', category_id=c.id) }}" onclick="return confirm('Remove this category? Products will become uncategorised.')">Remove</button>
+      </form>
+    {% else %}<p class="muted">No categories yet.</p>{% endfor %}
+  </div>
+  <form method="post" class="card">{{ csrf_field() }}
+    <h3>Add a category</h3>
+    <div class="field"><label for="name">Name</label><input id="name" type="text" name="name" required placeholder="e.g. Kitchen"></div>
+    <div class="field"><label for="description">Description</label><input id="description" type="text" name="description"></div>
+    <button class="btn btn-block" type="submit">Add category</button>
+  </form>
+</div>
+{% endblock %}

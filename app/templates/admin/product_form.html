@@ -1,0 +1,42 @@
+{% extends "portal_base.html" %}
+{% block title %}{{ 'Edit product' if product else 'Add product' }}{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head"><div><a class="muted small" href="{{ url_for('admin.products') }}">← Products</a><h1>{{ 'Edit product' if product else 'Add a product' }}</h1></div></div>
+{% set v = product or {} %}
+{% set f = request.form if request.method == 'POST' else v %}
+<form method="post" enctype="multipart/form-data" class="two-col">{{ csrf_field() }}
+  <div>
+    <div class="card">
+      <div class="field"><label for="name">Product name</label><input id="name" type="text" name="name" value="{{ f.get('name', '') }}" required></div>
+      <div class="field"><label for="description">Description</label><textarea id="description" name="description">{{ f.get('description', '') or '' }}</textarea></div>
+      <div class="field-row">
+        <div class="field"><label for="price">Price ({{ cfg.CURRENCY_SYMBOL }})</label><input id="price" type="number" step="0.01" min="0" name="price" value="{{ f.get('price', '') }}" required></div>
+        <div class="field"><label for="compare_at_price">Was price <span class="muted">(optional, shows a sale)</span></label><input id="compare_at_price" type="number" step="0.01" min="0" name="compare_at_price" value="{{ f.get('compare_at_price', '') or '' }}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="category_id">Category</label>
+          <select id="category_id" name="category_id"><option value="">— None —</option>{% for c in categories %}<option value="{{ c.id }}" {% if f.get('category_id')|string == c.id|string %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="seller_id">Supplied by seller</label>
+          <select id="seller_id" name="seller_id"><option value="">— Not set —</option>{% for s in sellers %}<option value="{{ s.id }}" {% if f.get('seller_id')|string == s.id|string %}selected{% endif %}>{{ s.name }}{% if s.business_name %} · {{ s.business_name }}{% endif %}</option>{% endfor %}</select>
+          <div class="hint">Used to suggest which seller receives orders for this product.</div></div>
+      </div>
+      <div class="field"><label for="stock">Stock on hand</label><input id="stock" type="number" min="0" name="stock" value="{{ f.get('stock', 0) }}"></div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h3>Image</h3>
+      <img class="image-preview" id="preview" src="{{ v.get('image') or url_for('static', filename='img/placeholder.svg') }}" alt="">
+      <div class="field" style="margin-top:12px"><input type="file" name="image" accept="image/*" data-image-input="#preview"><div class="hint">PNG, JPG or WEBP, up to 5 MB. Square images look best.</div></div>
+    </div>
+    <div class="card">
+      <h3>Visibility</h3>
+      <label class="check"><input type="checkbox" name="active" {% if product is none or f.get('active') %}checked{% endif %}> Show in the shop</label>
+      <label class="check" style="margin-top:10px"><input type="checkbox" name="is_new" {% if f.get('is_new') %}checked{% endif %}> Mark as “New”</label>
+      <label class="check" style="margin-top:10px"><input type="checkbox" name="is_featured" {% if f.get('is_featured') %}checked{% endif %}> Feature on the home page</label>
+    </div>
+    <button class="btn btn-block" type="submit">{{ 'Save changes' if product else 'Add product' }}</button>
+  </div>
+</form>
+{% endblock %}

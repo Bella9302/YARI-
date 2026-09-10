@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ cfg.BUSINESS_NAME }}{% endblock %} · {{ cfg.BUSINESS_NAME }}</title>
+  <meta name="description" content="{% block meta_description %}{{ cfg.BUSINESS_TAGLINE }}{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="announcement">
+    Order through your YARI representative · Free advice, personal delivery · <a href="{{ url_for('shop.promotions') }}">See this month's offers</a>
+  </div>
+  <div class="header-bar container">
+    <button class="icon-btn menu-toggle" aria-label="Open menu" aria-expanded="false" data-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" href="{{ url_for('shop.home') }}">
+      <span class="brand-mark">Y</span>
+      <span class="brand-name">{{ cfg.BUSINESS_NAME }}</span>
+    </a>
+    <form class="search" action="{{ url_for('shop.products') }}" method="get" role="search">
+      <input type="search" name="q" placeholder="Search products…" value="{{ request.args.get('q', '') }}" aria-label="Search products">
+      <button type="submit" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+    </form>
+    <nav class="header-actions">
+      <a class="icon-link" href="{{ url_for('auth.account_home') }}" aria-label="Account">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span>{% if g.user %}{{ g.user.name.split()[0] }}{% else %}Log in{% endif %}</span>
+      </a>
+      <a class="icon-link cart-link" href="{{ url_for('shop.cart') }}" aria-label="Cart">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7h12l-1 12H7L6 7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+        <span>Cart</span>
+        {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+      </a>
+    </nav>
+  </div>
+  <nav class="main-nav container" data-menu>
+    <a href="{{ url_for('shop.products') }}">Shop all</a>
+    {% for c in nav_categories %}
+      <a href="{{ url_for('shop.products', category=c.slug) }}">{{ c.name }}</a>
+    {% endfor %}
+    <a href="{{ url_for('shop.products', new=1) }}">New in</a>
+    <a class="accent" href="{{ url_for('shop.promotions') }}">Offers</a>
+    <a href="{{ url_for('shop.contact') }}">Contact</a>
+    <div class="mobile-only nav-extra">
+      <a href="{{ url_for('shop.track') }}">Track an order</a>
+      <a href="{{ url_for('shop.delivery') }}">Delivery & returns</a>
+    </div>
+  </nav>
+  <form class="search search-mobile container" action="{{ url_for('shop.products') }}" method="get" role="search">
+    <input type="search" name="q" placeholder="Search products…" value="{{ request.args.get('q', '') }}" aria-label="Search products">
+    <button type="submit" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+  </form>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes container" role="status">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main id="main" class="{% block main_class %}container{% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="brand" href="{{ url_for('shop.home') }}"><span class="brand-mark">Y</span><span class="brand-name">{{ cfg.BUSINESS_NAME }}</span></a>
+      <p class="muted">{{ cfg.BUSINESS_TAGLINE }}</p>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <a href="{{ url_for('shop.products') }}">All products</a>
+      {% for c in nav_categories %}<a href="{{ url_for('shop.products', category=c.slug) }}">{{ c.name }}</a>{% endfor %}
+    </div>
+    <div>
+      <h4>Help</h4>
+      <a href="{{ url_for('shop.delivery') }}">Delivery & returns</a>
+      <a href="{{ url_for('shop.track') }}">Track an order</a>
+      <a href="{{ url_for('shop.contact') }}">Contact us</a>
+      <a href="{{ url_for('shop.about') }}">How ordering works</a>
+    </div>
+    <div>
+      <h4>Get in touch</h4>
+      <a href="mailto:{{ cfg.BUSINESS_EMAIL }}">{{ cfg.BUSINESS_EMAIL }}</a>
+      <a href="tel:{{ cfg.BUSINESS_PHONE|replace(' ', '') }}">{{ cfg.BUSINESS_PHONE }}</a>
+      <a href="https://wa.me/{{ cfg.BUSINESS_WHATSAPP }}" target="_blank" rel="noopener">WhatsApp us</a>
+      <a href="{{ url_for('auth.login') }}">Seller & representative login</a>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© {{ cfg.BUSINESS_NAME }}. All rights reserved.</span>
+    <span>Secure ordering through your personal representative.</span>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,8 @@
+<dl class="kv">
+  <dt>Customer</dt><dd>{{ order.customer_name }}</dd>
+  <dt>Phone</dt><dd><a href="tel:{{ order.customer_phone|replace(' ', '') }}">{{ order.customer_phone }}</a></dd>
+  {% if order.customer_email %}<dt>Email</dt><dd><a href="mailto:{{ order.customer_email }}">{{ order.customer_email }}</a></dd>{% endif %}
+  <dt>Deliver to</dt><dd>{{ order.customer_address }}</dd>
+  {% if order.notes %}<dt>Notes</dt><dd>{{ order.notes }}</dd>{% endif %}
+  <dt>Payment</dt><dd><span class="pill pill-{{ order.payment_status }}">{{ order.payment_status }}</span> · {{ 'via representative' if order.payment_method == 'rep' else 'online' }}{% if order.payment_reference %} · ref {{ order.payment_reference }}{% endif %}</dd>
+</dl>

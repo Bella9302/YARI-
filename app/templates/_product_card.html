@@ -1,0 +1,26 @@
+<article class="product-card">
+  <a class="product-media" href="{{ url_for('shop.product_detail', slug=p.slug) }}">
+    <img src="{{ p.image or url_for('static', filename='img/placeholder.svg') }}" alt="{{ p.name }}" loading="lazy">
+    {% if p.compare_at_price and p.compare_at_price > p.price %}
+      <span class="badge badge-sale">-{{ ((1 - p.price / p.compare_at_price) * 100)|round|int }}%</span>
+    {% elif p.is_new %}
+      <span class="badge badge-new">New</span>
+    {% endif %}
+    {% if p.stock <= 0 %}<span class="badge badge-out">Sold out</span>{% endif %}
+  </a>
+  <div class="product-body">
+    {% if p.category_name %}<span class="eyebrow">{{ p.category_name }}</span>{% endif %}
+    <h3><a href="{{ url_for('shop.product_detail', slug=p.slug) }}">{{ p.name }}</a></h3>
+    <div class="price-row">
+      <span class="price">{{ p.price|money }}</span>
+      {% if p.compare_at_price and p.compare_at_price > p.price %}<s class="was">{{ p.compare_at_price|money }}</s>{% endif %}
+    </div>
+    <form method="post" action="{{ url_for('shop.cart_add') }}">{{ csrf_field() }}
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+      <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+      <button class="btn btn-outline btn-block" type="submit" {% if p.stock <= 0 %}disabled{% endif %}>
+        {% if p.stock <= 0 %}Sold out{% else %}Add to cart{% endif %}
+      </button>
+    </form>
+  </div>
+</article>

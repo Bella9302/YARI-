@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <div class="card">
+    <span class="eyebrow">Sellers · Representatives · Owner</span>
+    <h1 style="font-size:1.8rem">Log in to your account</h1>
+    <form method="post">{{ csrf_field() }}
+      <div class="field"><label for="email">Email</label><input id="email" type="email" name="email" required autofocus autocomplete="username"></div>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" name="password" required autocomplete="current-password"></div>
+      <button class="btn btn-block" type="submit">Log in</button>
+    </form>
+    <p class="muted small" style="margin:16px 0 0">Accounts are created by the store owner. Need one? <a href="{{ url_for('shop.contact') }}" style="text-decoration:underline">Contact us</a>.</p>
+    {% if cfg.SHOW_DEMO_LOGINS %}
+    <div class="demo-box">
+      <strong>Demo logins</strong> (password <code>password123</code>):<br>
+      Owner <code>owner@yari.co.za</code> · Seller <code>naledi@yari.co.za</code> · Rep <code>lerato@yari.co.za</code>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

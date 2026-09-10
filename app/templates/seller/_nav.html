@@ -1,0 +1,2 @@
+<a href="{{ url_for('seller.dashboard') }}" class="{% if request.endpoint == 'seller.dashboard' and not request.args.get('status') %}active{% endif %}">My orders</a>
+<a href="{{ url_for('seller.dashboard', status='sent_to_seller') }}" class="{% if request.args.get('status') == 'sent_to_seller' %}active{% endif %}">New to prepare</a>

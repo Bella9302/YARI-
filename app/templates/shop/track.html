@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Track an order{% endblock %}
+{% block content %}
+<div class="page page-narrow">
+  <h1>Track your order</h1>
+  <form method="get" class="card">
+    <div class="field-row">
+      <div class="field"><label for="order_number">Order number</label><input id="order_number" type="text" name="order_number" value="{{ number }}" placeholder="YL123456" required></div>
+      <div class="field"><label for="phone">Phone number used at checkout</label><input id="phone" type="tel" name="phone" value="{{ phone }}" required></div>
+    </div>
+    <button class="btn" type="submit">Find my order</button>
+  </form>
+  {% if order %}
+  <div class="card">
+    <div class="page-head"><h3 style="margin:0">Order {{ order.order_number }}</h3><span class="pill pill-{{ order.status }}">{{ order.status|status_label }}</span></div>
+    <p class="muted small">Placed {{ order.created_at|nice_date }} · Representative: {{ order.rep_name }}{% if order.rep_phone %} ({{ order.rep_phone }}){% endif %} · Payment: <span class="pill pill-{{ order.payment_status }}">{{ order.payment_status }}</span></p>
+    {% for item in items %}<div class="summary-row"><span>{{ item.product_name }} × {{ item.quantity }}</span><span>{{ (item.unit_price * item.quantity)|money }}</span></div>{% endfor %}
+    <div class="summary-row total"><span>Total</span><span>{{ order.total|money }}</span></div>
+  </div>
+  <div class="card">
+    <h3>Progress</h3>
+    <ul class="timeline">
+      {% for e in events %}<li><strong>{{ e.status|status_label if e.status != 'payment' else 'Payment' }}</strong>{% if e.note %} — {{ e.note }}{% endif %}<div class="when">{{ e.created_at|nice_date }}</div></li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

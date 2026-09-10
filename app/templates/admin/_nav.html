@@ -1,0 +1,8 @@
+{% set ep = request.endpoint or '' %}
+<a href="{{ url_for('admin.dashboard') }}" class="{% if ep == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
+<a href="{{ url_for('admin.orders') }}" class="{% if ep.startswith('admin.order') %}active{% endif %}">Orders</a>
+<a href="{{ url_for('admin.products') }}" class="{% if ep.startswith('admin.product') %}active{% endif %}">Products</a>
+<a href="{{ url_for('admin.categories') }}" class="{% if ep.startswith('admin.categor') %}active{% endif %}">Categories</a>
+<a href="{{ url_for('admin.promotions') }}" class="{% if ep.startswith('admin.promotion') %}active{% endif %}">Promotions</a>
+<a href="{{ url_for('admin.users') }}" class="{% if ep.startswith('admin.user') %}active{% endif %}">Sellers & reps</a>
+<a href="{{ url_for('admin.messages') }}" class="{% if ep.startswith('admin.message') %}active{% endif %}">Messages</a>

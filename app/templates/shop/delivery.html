@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Delivery & returns{% endblock %}
+{% block content %}
+<div class="page prose">
+  <h1>Delivery & returns</h1>
+  <h2>How delivery works</h2>
+  <p>Every order is handled by your YARI sales representative. Once the store owner has sent your order to the seller, it is packed and passed to your representative, who delivers it to the address you gave at checkout. Most orders are delivered within 3–7 working days.</p>
+  <p>You can check progress at any time on the <a href="{{ url_for('shop.track') }}" style="text-decoration:underline">track your order</a> page using your order number and phone number.</p>
+  <h2>Payment</h2>
+  <p>You can pay your representative in cash or by EFT. Representatives then pay YARI using their unique reference code, which keeps every payment traceable. Online card payment will be offered as soon as it becomes available.</p>
+  <h2>Returns & exchanges</h2>
+  <div class="faq">
+    <details><summary>Can I return a product?</summary><p>Yes. Unopened, unused items in their original packaging can be returned within 7 days of delivery. Hand the item to your representative and they will log the return for you.</p></details>
+    <details><summary>What if an item arrives damaged?</summary><p>Tell your representative within 48 hours of delivery. We will replace the item or refund you in full.</p></details>
+    <details><summary>Can I exchange for a different size or colour?</summary><p>Clothing and jewellery can be exchanged within 7 days, subject to availability. Personal care items cannot be exchanged once opened, for hygiene reasons.</p></details>
+    <details><summary>How are refunds paid?</summary><p>Refunds are paid to you by your representative, or by EFT to your bank account, within 5 working days of the return being approved.</p></details>
+  </div>
+  <p style="margin-top:28px">Questions? <a href="{{ url_for('shop.contact') }}" style="text-decoration:underline">Contact us</a> — we're happy to help.</p>
+</div>
+{% endblock %}

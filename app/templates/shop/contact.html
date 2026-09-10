@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Contact us{% endblock %}
+{% block content %}
+<div class="page">
+  <h1>Contact us</h1>
+  <div class="contact-grid">
+    <div>
+      <p class="muted">Questions about a product, an order, or becoming a representative? We usually reply within one working day.</p>
+      <ul class="contact-list">
+        <li><span>📞</span><div><strong>Phone</strong><a href="tel:{{ cfg.BUSINESS_PHONE|replace(' ', '') }}">{{ cfg.BUSINESS_PHONE }}</a></div></li>
+        <li><span>💬</span><div><strong>WhatsApp</strong><a href="https://wa.me/{{ cfg.BUSINESS_WHATSAPP }}" target="_blank" rel="noopener">Chat with us</a></div></li>
+        <li><span>✉️</span><div><strong>Email</strong><a href="mailto:{{ cfg.BUSINESS_EMAIL }}">{{ cfg.BUSINESS_EMAIL }}</a></div></li>
+        <li><span>📍</span><div><strong>Where we are</strong><span class="muted">{{ cfg.BUSINESS_ADDRESS }}</span></div></li>
+      </ul>
+    </div>
+    <form method="post" class="card">{{ csrf_field() }}
+      <div class="field-row">
+        <div class="field"><label for="name">Your name</label><input id="name" type="text" name="name" required></div>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" name="email" required></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="phone">Phone <span class="muted">(optional)</span></label><input id="phone" type="tel" name="phone"></div>
+        <div class="field"><label for="subject">Subject</label>
+          <select id="subject" name="subject">
+            <option>General question</option><option>About my order</option><option>Product enquiry</option><option>I want to become a representative</option><option>I want to sell through YARI</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>
+      <button class="btn" type="submit">Send message</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "portal_base.html" %}
+{% block title %}{{ 'Edit account' if user else 'Add account' }}{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<div class="page-head"><div><a class="muted small" href="{{ url_for('admin.users') }}">← Accounts</a><h1>{{ 'Edit account' if user else 'Add an account' }}</h1></div></div>
+{% set f = request.form if request.method == 'POST' else (user or {}) %}
+<form method="post" class="card" style="max-width:640px">{{ csrf_field() }}
+  {% if user and user.rep_code %}<p>Representative code: <span class="code-chip">{{ user.rep_code }}</span></p>{% endif %}
+  {% if not user %}
+  <div class="field"><label for="role">Account type</label>
+    <select id="role" name="role" required>
+      <option value="rep" {% if f.get('role') == 'rep' %}selected{% endif %}>Sales representative — places orders for customers, gets a unique code</option>
+      <option value="seller" {% if f.get('role') == 'seller' %}selected{% endif %}>Seller — receives and fulfils orders</option>
+      <option value="owner" {% if f.get('role') == 'owner' %}selected{% endif %}>Owner — full access</option>
+    </select></div>
+  {% endif %}
+  <div class="field-row">
+    <div class="field"><label for="name">Full name</label><input id="name" type="text" name="name" value="{{ f.get('name', '') }}" required></div>
+    <div class="field"><label for="business_name">Business name <span class="muted">(sellers)</span></label><input id="business_name" type="text" name="business_name" value="{{ f.get('business_name', '') or '' }}"></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><label for="email">Email (used to log in)</label><input id="email" type="email" name="email" value="{{ f.get('email', '') }}" required></div>
+    <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" name="phone" value="{{ f.get('phone', '') or '' }}"></div>
+  </div>
+  <div class="field"><label for="password">{{ 'New password (leave blank to keep current)' if user else 'Password' }}</label><input id="password" type="password" name="password" {% if not user %}required{% endif %} minlength="8" autocomplete="new-password"><div class="hint">At least 8 characters.</div></div>
+  {% if user and user.id != g.user.id %}<label class="check" style="margin-bottom:16px"><input type="checkbox" name="active" {% if user.active %}checked{% endif %}> Account is active (can log in)</label>{% endif %}
+  <button class="btn" type="submit">{{ 'Save changes' if user else 'Create account' }}</button>
+</form>
+{% endblock %}

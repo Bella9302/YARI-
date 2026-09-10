@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="page">
+  <h1>Checkout</h1>
+  <div class="checkout-layout">
+    <form method="post" id="checkout-form">{{ csrf_field() }}
+      <div class="card">
+        <h3>1. Your details</h3>
+        <div class="field-row">
+          <div class="field"><label for="customer_name">Full name</label><input id="customer_name" type="text" name="customer_name" value="{{ form.customer_name }}" required></div>
+          <div class="field"><label for="customer_phone">Phone / WhatsApp</label><input id="customer_phone" type="tel" name="customer_phone" value="{{ form.customer_phone }}" required></div>
+        </div>
+        <div class="field"><label for="customer_email">Email <span class="muted">(optional)</span></label><input id="customer_email" type="email" name="customer_email" value="{{ form.customer_email }}"></div>
+        <div class="field"><label for="customer_address">Delivery address</label><textarea id="customer_address" name="customer_address" required style="min-height:90px">{{ form.customer_address }}</textarea></div>
+      </div>
+
+      <div class="card">
+        <h3>2. Your sales representative</h3>
+        {% if logged_in_rep %}
+          <div class="notice">You are placing this order as <strong>{{ logged_in_rep.name }}</strong> (code {{ logged_in_rep.rep_code }}). It will appear on your representative dashboard.</div>
+        {% else %}
+          <p class="muted small">All orders are fulfilled through a YARI representative, who will confirm payment and delivery with you.</p>
+          <div class="field">
+            <label for="rep_id">Choose your representative</label>
+            <select id="rep_id" name="rep_id">
+              <option value="">— Select —</option>
+              {% for r in reps %}<option value="{{ r.id }}" {% if form.rep_id == r.id|string %}selected{% endif %}>{{ r.name }} ({{ r.rep_code }})</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="rep_code">Or enter your representative's code</label>
+            <input id="rep_code" type="text" name="rep_code" value="{{ form.rep_code }}" placeholder="e.g. YR-LER01" style="text-transform:uppercase">
+            <div class="hint">Don't have a representative? <a href="{{ url_for('shop.contact') }}" style="text-decoration:underline">Contact us</a> and we'll connect you with one.</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>3. Payment</h3>
+        <div class="choice-list">
+          <label class="choice">
+            <input type="radio" name="payment_method" value="rep" {% if form.payment_method != 'online' or not cfg.ONLINE_PAYMENTS_ENABLED %}checked{% endif %}>
+            <div><strong>Pay your representative</strong><span>Pay cash or EFT to your representative. They pay YARI using their unique code and confirm your order.</span></div>
+          </label>
+          <label class="choice" {% if not cfg.ONLINE_PAYMENTS_ENABLED %}style="opacity:.6"{% endif %}>
+            <input type="radio" name="payment_method" value="online" {% if not cfg.ONLINE_PAYMENTS_ENABLED %}disabled{% elif form.payment_method == 'online' %}checked{% endif %}>
+            <div><strong>Pay online</strong><span>{% if cfg.ONLINE_PAYMENTS_ENABLED %}Secure card or instant EFT payment.{% else %}Online payment is not available yet — please pay your representative for now.{% endif %}</span></div>
+          </label>
+        </div>
+        <div class="field" style="margin-top:16px"><label for="notes">Order notes <span class="muted">(optional)</span></label><textarea id="notes" name="notes" style="min-height:70px" placeholder="Sizes, colours, delivery instructions…">{{ form.notes }}</textarea></div>
+      </div>
+      <input type="hidden" name="promo_code" value="{{ form.promo_code }}">
+      <button class="btn btn-block" type="submit" style="margin-top:6px">Place order · {{ total|money }}</button>
+    </form>
+
+    <aside>
+      <div class="card">
+        <h3>Your order</h3>
+        {% for item in items %}
+          <div class="summary-row"><span>{{ item.product.name }} <span class="muted">× {{ item.quantity }}</span></span><span>{{ item.line_total|money }}</span></div>
+        {% endfor %}
+        <div class="summary-row" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px"><span>Subtotal</span><span>{{ subtotal|money }}</span></div>
+        {% if promotion %}<div class="summary-row" style="color:var(--success)"><span>{{ promotion.code }} ({{ promotion.discount_percent|round|int }}% off)</span><span>−{{ discount|money }}</span></div>{% endif %}
+        <div class="summary-row"><span>Delivery</span><span>{% if delivery_fee %}{{ delivery_fee|money }}{% else %}Arranged by your rep{% endif %}</span></div>
+        <div class="summary-row total"><span>Total</span><span>{{ total|money }}</span></div>
+      </div>
+      <div class="card">
+        <h3>Promo code</h3>
+        <form method="post" class="inline-form">{{ csrf_field() }}
+          <input type="hidden" name="action" value="apply_promo">
+          <input type="text" name="promo_code" value="{{ form.promo_code }}" placeholder="Enter code" style="flex:1;text-transform:uppercase">
+          <button class="btn btn-outline btn-sm" type="submit">Apply</button>
+        </form>
+      </div>
+      <a class="muted small" href="{{ url_for('shop.cart') }}" style="display:block;margin-top:12px;text-align:center;text-decoration:underline">← Edit cart</a>
+    </aside>
+  </div>
+</div>
+{% endblock %}

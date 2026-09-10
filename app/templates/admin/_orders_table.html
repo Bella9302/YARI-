@@ -1,0 +1,22 @@
+{% set rows = orders if orders is defined else recent %}
+{% if rows %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Order</th><th>Customer</th><th>Representative</th><th>Seller</th><th>Status</th><th>Paid</th><th class="text-right">Total</th><th>Placed</th></tr></thead>
+  <tbody>
+  {% for o in rows %}
+    <tr>
+      <td><a href="{{ url_for('admin.order_detail', order_id=o.id) }}" style="font-weight:600">{{ o.order_number }}</a></td>
+      <td>{{ o.customer_name }}<div class="muted small">{{ o.customer_phone }}</div></td>
+      <td>{{ o.rep_name }}</td>
+      <td>{{ o.seller_name or '—' }}</td>
+      <td><span class="pill pill-{{ o.status }}">{{ o.status|status_label }}</span></td>
+      <td><span class="pill pill-{{ o.payment_status }}">{{ o.payment_status }}</span></td>
+      <td class="text-right">{{ o.total|money }}</td>
+      <td class="muted small">{{ o.created_at|nice_date }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}<p class="muted">No orders yet.</p>{% endif %}

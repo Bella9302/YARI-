@@ -1,0 +1,17 @@
+{% extends "portal_base.html" %}
+{% block title %}Orders{% endblock %}
+{% block portal_links %}{% include "admin/_nav.html" %}{% endblock %}
+{% block portal_content %}
+<h1>Orders</h1>
+<div class="tabs">
+  <a href="{{ url_for('admin.orders') }}" class="{% if not status %}active{% endif %}">All</a>
+  {% for s in statuses %}<a href="{{ url_for('admin.orders', status=s) }}" class="{% if status == s %}active{% endif %}">{{ s|status_label }}</a>{% endfor %}
+</div>
+<form method="get" class="filter-bar">
+  {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+  <input type="search" name="q" value="{{ q }}" placeholder="Order no., customer, phone">
+  <select name="rep"><option value="">All representatives</option>{% for r in reps %}<option value="{{ r.id }}" {% if rep_id == r.id %}selected{% endif %}>{{ r.name }}</option>{% endfor %}</select>
+  <button class="btn btn-outline btn-sm" type="submit">Filter</button>
+</form>
+<div class="card">{% include "admin/_orders_table.html" %}</div>
+{% endblock %}

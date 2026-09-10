@@ -1,0 +1,20 @@
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Product</th>{% if show_seller %}<th>Supplied by</th>{% endif %}<th>Qty</th><th class="text-right">Price</th><th class="text-right">Total</th></tr></thead>
+  <tbody>
+  {% for i in items %}
+    <tr>
+      <td><img class="thumb" src="{{ i.image or url_for('static', filename='img/placeholder.svg') }}" alt=""></td>
+      <td>{{ i.product_name }}</td>
+      {% if show_seller %}<td class="muted">{{ i.product_seller or '—' }}</td>{% endif %}
+      <td>{{ i.quantity }}</td>
+      <td class="text-right">{{ i.unit_price|money }}</td>
+      <td class="text-right">{{ (i.unit_price * i.quantity)|money }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="summary-row" style="margin-top:10px"><span>Subtotal</span><span>{{ order.subtotal|money }}</span></div>
+{% if order.discount %}<div class="summary-row"><span>Discount {% if order.promo_code %}({{ order.promo_code }}){% endif %}</span><span>−{{ order.discount|money }}</span></div>{% endif %}
+<div class="summary-row total"><span>Total</span><span>{{ order.total|money }}</span></div>
