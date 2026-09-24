@@ -1,12 +1,15 @@
 """Login / logout and role-based access control for owner, sellers and sales reps."""
 from functools import wraps
 
-from flask import Blueprint, abort, flash, g, redirect, render_template, request, session, url_for
+from flask import (Blueprint, abort, current_app, flash, g, redirect, render_template, request,
+                   session, url_for)
 from werkzeug.security import check_password_hash
 
 from .db import query
 
 bp = Blueprint("auth", __name__, url_prefix="/account")
+
+DEMO_OWNER_EMAIL = "owner@yari.co.za"
 
 ROLE_HOME = {
     "owner": "admin.dashboard",
@@ -64,7 +67,10 @@ def login():
                 return redirect(next_url)
             return redirect(url_for(ROLE_HOME[user["role"]]))
 
-    return render_template("auth/login.html")
+    show_demo = current_app.config["SHOW_DEMO_LOGINS"] and query(
+        "SELECT id FROM users WHERE email = ? AND active = 1", (DEMO_OWNER_EMAIL,), one=True
+    ) is not None
+    return render_template("auth/login.html", show_demo=show_demo)
 
 
 @bp.route("/logout", methods=("POST",))

@@ -16,6 +16,9 @@ The site uses clean white/neutral backgrounds, is fully responsive, and works we
 
 ## Quick start
 
+**New to this? Follow [DEPLOYMENT.md](DEPLOYMENT.md)**, a step-by-step guide for running the store on your
+computer and putting it online for free.
+
 Requirements: Python 3.10+.
 
 ```bash
@@ -37,10 +40,13 @@ python run.py                      # open http://localhost:5000
 | Rep   | lerato@yari.co.za (code `YR-LER01`) | `/rep/` |
 | Rep   | sipho@yari.co.za  (code `YR-SIP02`) | `/rep/` |
 
-To start with an empty catalogue instead, run `flask --app app init-db` and create your
-owner account by inserting it via the seed command, then delete the demo data from the owner portal.
-(The simplest path: run `seed`, log in as the owner, change the owner's email/password
-under *Sellers & reps*, and delete the demo products/accounts you don't need.)
+To start with an empty store instead, skip `seed` and create your own owner login:
+
+```bash
+flask --app app create-owner       # asks for name, email and password
+```
+
+The demo login hints on the login page only appear while the demo owner account exists.
 
 ## How an order flows
 
@@ -70,13 +76,13 @@ Set these environment variables in production (all optional):
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
-| `SECRET_KEY` | Session signing key — **set a long random value** | dev value |
+| `SECRET_KEY` | Session signing key | random key generated once and saved in `instance/secret_key` |
 | `DATABASE_PATH` | SQLite file location | `instance/yari.sqlite` |
 | `BUSINESS_NAME`, `BUSINESS_EMAIL`, `BUSINESS_PHONE`, `BUSINESS_WHATSAPP`, `BUSINESS_ADDRESS` | Shown in header/footer/contact page | placeholders |
 | `CURRENCY_SYMBOL` | Price prefix | `R` |
 | `DELIVERY_FEE` | Flat delivery fee added at checkout | `0` |
 | `ONLINE_PAYMENTS_ENABLED` | `true` to offer the "Pay online" option | `false` |
-| `SHOW_DEMO_LOGINS` | `false` to hide the demo account hints on the login page | `true` |
+| `SHOW_DEMO_LOGINS` | `false` to always hide the demo account hints on the login page | shown only while demo data exists |
 
 ### Adding online payments
 
@@ -86,6 +92,8 @@ redirect the customer to the gateway (PayFast, Yoco, Ozow, …), and in the gate
 
 ## Deploying
 
+See [DEPLOYMENT.md](DEPLOYMENT.md) for a free, step-by-step PythonAnywhere setup.
+
 The app is a standard WSGI app (`wsgi:app`) with a `Procfile`, so it runs on Render, Railway,
 Fly.io, PythonAnywhere or any VPS:
 
@@ -94,7 +102,7 @@ gunicorn wsgi:app --bind 0.0.0.0:8000
 ```
 
 Persist `instance/` (the SQLite database) and `app/static/uploads/` (product images) on a
-disk that survives deploys. Set `SECRET_KEY` before going live, and change the demo passwords.
+disk that survives deploys. `instance/` also holds the generated secret key. Change or remove the demo accounts before going live.
 
 ## Tests
 

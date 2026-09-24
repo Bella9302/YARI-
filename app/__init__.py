@@ -12,6 +12,25 @@ from .auth import load_current_user
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _load_secret_key(instance_dir):
+    """Use SECRET_KEY from the environment, otherwise a random key kept in instance/secret_key.
+
+    The file is created on first start and reused afterwards, so logins survive restarts
+    without anyone having to invent a key by hand.
+    """
+    key = os.environ.get("SECRET_KEY")
+    if key:
+        return key
+    key_file = instance_dir / "secret_key"
+    if not key_file.exists():
+        key_file.write_text(secrets.token_hex(32))
+        try:
+            key_file.chmod(0o600)
+        except OSError:
+            pass
+    return key_file.read_text().strip()
+
+
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
@@ -19,7 +38,7 @@ def create_app(test_config=None):
     instance_dir.mkdir(parents=True, exist_ok=True)
 
     app.config.from_mapping(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-change-me-before-going-live"),
+        SECRET_KEY=_load_secret_key(instance_dir),
         DATABASE=os.environ.get("DATABASE_PATH", str(instance_dir / "yari.sqlite")),
         UPLOAD_FOLDER=str(Path(app.root_path) / "static" / "uploads"),
         MAX_CONTENT_LENGTH=5 * 1024 * 1024,  # 5 MB image uploads
@@ -35,7 +54,8 @@ def create_app(test_config=None):
         # Flip to True once a payment gateway (e.g. PayFast, Yoco) is connected in shop.py.
         ONLINE_PAYMENTS_ENABLED=os.environ.get("ONLINE_PAYMENTS_ENABLED", "false").lower() == "true",
         DELIVERY_FEE=float(os.environ.get("DELIVERY_FEE", "0")),
-        # Show the demo account list on the login page (turn off in production).
+        # The demo account hints on the login page appear only while the demo owner account
+        # exists. Set SHOW_DEMO_LOGINS=false to hide them regardless.
         SHOW_DEMO_LOGINS=os.environ.get("SHOW_DEMO_LOGINS", "true").lower() == "true",
         CSRF_ENABLED=True,
     )

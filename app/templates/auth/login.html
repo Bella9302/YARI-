@@ -11,7 +11,7 @@
       <button class="btn btn-block" type="submit">Log in</button>
     </form>
     <p class="muted small" style="margin:16px 0 0">Accounts are created by the store owner. Need one? <a href="{{ url_for('shop.contact') }}" style="text-decoration:underline">Contact us</a>.</p>
-    {% if cfg.SHOW_DEMO_LOGINS %}
+    {% if show_demo %}
     <div class="demo-box">
       <strong>Demo logins</strong> (password <code>password123</code>):<br>
       Owner <code>owner@yari.co.za</code> · Seller <code>naledi@yari.co.za</code> · Rep <code>lerato@yari.co.za</code>
