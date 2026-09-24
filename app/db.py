@@ -91,8 +91,48 @@ def create_owner_command(name, email, password):
     click.echo(f"Owner account created. Log in at /account/login with {email}.")
 
 
+@click.command("users")
+@with_appcontext
+def list_users_command():
+    """List every login account, so you can see which emails exist."""
+    init_db()
+    rows = query("SELECT name, email, role, rep_code, active FROM users ORDER BY role, name")
+    if not rows:
+        click.echo("There are no accounts yet. Create one with:  flask --app app create-owner")
+        return
+    labels = {"owner": "Owner", "seller": "Seller", "rep": "Sales rep"}
+    for r in rows:
+        extra = f"  code {r['rep_code']}" if r["rep_code"] else ""
+        status = "" if r["active"] else "  (deactivated)"
+        click.echo(f"{labels.get(r['role'], r['role']):<10} {r['email']:<35} {r['name']}{extra}{status}")
+
+
+@click.command("reset-password")
+@click.option("--email", prompt="Email of the account")
+@click.password_option("--password", prompt="New password (at least 8 characters)")
+@with_appcontext
+def reset_password_command(email, password):
+    """Set a new password for an account and make sure it is active."""
+    from werkzeug.security import generate_password_hash
+
+    init_db()
+    email = email.strip()
+    if len(password) < 8:
+        raise click.ClickException("The password must be at least 8 characters.")
+    user = query("SELECT id FROM users WHERE email = ?", (email,), one=True)
+    if user is None:
+        raise click.ClickException(
+            f"No account uses {email}. See every account with:  flask --app app users"
+        )
+    execute("UPDATE users SET password_hash = ?, active = 1 WHERE id = ?",
+            (generate_password_hash(password), user["id"]))
+    click.echo(f"Password updated. Log in at /account/login with {email}.")
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
     app.cli.add_command(seed_command)
     app.cli.add_command(create_owner_command)
+    app.cli.add_command(list_users_command)
+    app.cli.add_command(reset_password_command)

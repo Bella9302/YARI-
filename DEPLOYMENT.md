@@ -229,5 +229,7 @@ Then click **Reload** on the Web tab.
 | `'python' is not recognized` or `command not found` on Windows | Reinstall Python and tick "Add python.exe to PATH". Or use `py` instead of `python`. |
 | `No module named flask` | Run the `activate` line again, then `pip install -r requirements.txt`. |
 | "Something went wrong" page on PythonAnywhere | On the Web tab, open the **error log** link. The last lines say what failed. Most often the path or YOURNAME in the WSGI file has a typo. |
-| Forgot the owner password | In a console in the `yari` folder, run the `activate` line, then `flask --app app create-owner` with a new email. Log in with it and reset the old account under **Sellers & reps**. |
+| "Incorrect email or password" | In a console in the `yari` folder, run the `activate` line, then `flask --app app users` to see every account. If the list is empty, run `flask --app app create-owner`. If your email is listed, run `flask --app app reset-password`. Nothing appears on screen while you type a password; that is normal. |
+| Forgot a password | Same as above: `flask --app app reset-password`. |
+| Footer still shows `hello@yarilifestyle.co.za` or `+27 00 000 0000` | The site hasn't picked up your WSGI file. Check that each line still starts with `os.environ["BUSINESS_...`, click **Save**, then click **Reload** on the Web tab. |
 | "The form has expired" | Refresh the page and submit again. This protects forms from being submitted by other websites. |

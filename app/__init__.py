@@ -22,13 +22,21 @@ def _load_secret_key(instance_dir):
     if key:
         return key
     key_file = instance_dir / "secret_key"
-    if not key_file.exists():
-        key_file.write_text(secrets.token_hex(32))
-        try:
-            key_file.chmod(0o600)
-        except OSError:
-            pass
-    return key_file.read_text().strip()
+    try:
+        # O_EXCL: only one process can create the file, so every worker shares one key.
+        fd = os.open(key_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        pass
+    else:
+        with os.fdopen(fd, "w") as fh:
+            fh.write(secrets.token_hex(32))
+    key = key_file.read_text().strip()
+    if not key:  # another worker created the file but hasn't finished writing it
+        import time
+
+        time.sleep(0.2)
+        key = key_file.read_text().strip()
+    return key
 
 
 def create_app(test_config=None):
